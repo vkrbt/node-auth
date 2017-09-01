@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const strategy = require('./app/strategy');
 const cors = require('cors');
+const routes = require('./app/router');
 
 passport.use(strategy);
 
@@ -15,9 +16,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 app.use(cors());
-
-
-require('./app/router')(app);
+app.use(routes);
 
 const port = 3101;
 app.listen(port, () => {
