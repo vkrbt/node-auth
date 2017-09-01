@@ -6,19 +6,6 @@ const passportJwt = require('passport-jwt');
 const ExtractJwt = passportJwt.ExtractJwt;
 const JwtStrategy = passportJwt.Strategy;
 
-const users = [
-  {
-    id: 1,
-    name: 'admin',
-    password: '1234'
-  },
-  {
-    id: 2,
-    name: 'test',
-    password: 'test'
-  }
-];
-
 const opts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('jwt'),
   secretOrKey: 'vkrbt',

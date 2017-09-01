@@ -6,23 +6,10 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 
-const strategy = require('./stratergy');
+const strategy = require('./app/strategy');
 const options = strategy.options;
 
-const users = [{
-    id: 1,
-    name: 'admin',
-    password: '1234'
-  },
-  {
-    id: 2,
-    name: 'test',
-    password: 'test'
-  }
-];
-
 const app = express();
-
 
 passport.use(strategy);
 
@@ -31,7 +18,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json())
 
-require('./router')(app);
+require('./app/router')(app);
 
 const port = 3101;
 app.listen(port, () => {
