@@ -43,7 +43,6 @@ module.exports = (app) => {
   });
 
   app.post('/register', async (req, res) => {
-    console.log(req.body)
     try {
       let user = await UserModel.findOne({ name: req.body.name })
         .lean()
@@ -53,6 +52,7 @@ module.exports = (app) => {
           name: req.body.name,
           password: req.body.password,
         });
+        res.json(user);
       } else {
         res.status(400).json({ message: 'bad request' });
       }

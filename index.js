@@ -6,9 +6,9 @@ const passport = require('passport');
 const strategy = require('./app/strategy');
 const cors = require('cors');
 
-const app = express();
-
 passport.use(strategy);
+
+const app = express();
 
 app.use(bodyParser.urlencoded({
   extended: true,
