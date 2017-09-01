@@ -3,6 +3,7 @@
 const bcrypt = require('bcryptjs');
 
 const mongoose = require('mongoose');
+
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
@@ -12,14 +13,15 @@ const UserSchema = new Schema(
     registered: { type: Date, default: Date.now },
   }, {
     versionKey: false,
-    collection: 'UserCollection'
+    collection: 'UserCollection',
   });
 
-UserSchema.pre('save', function(next){
-  if(this.isModified('password') || this.isNew()){
+UserSchema.pre('save', function (next) {
+  if (this.isModified('password') || this.isNew()) {
+    console.log(this.password);
     this.password = bcrypt.hashSync(this.password, 12);
     next();
   }
-})
+});
 
 module.exports = mongoose.model('UserModel', UserSchema);
