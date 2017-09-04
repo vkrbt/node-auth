@@ -3,7 +3,7 @@ const passport = require('passport');
 const UserModel = require('./models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const options = require('./strategy').options;
+const options = require('./config');
 const express = require('express');
 
 const router = express.Router();
@@ -35,7 +35,7 @@ router.post('/login', async (req, res) => {
         token,
       });
     } else {
-      res.status(401).json({
+      res.status(400).json({
         message: 'no such user or password incorrect',
       });
     }
@@ -65,10 +65,10 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.get('/secret', passport.authenticate('jwt', {
+router.get('/user', passport.authenticate('jwt', {
   session: false,
 }), (req, res) => {
-  res.json('Yeah');
+  res.json({ name: res.req.user.name });
 });
 
 module.exports = router;
