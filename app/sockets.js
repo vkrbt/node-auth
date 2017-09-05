@@ -12,27 +12,26 @@ const authenticate = (socket, next) => {
 };
 
 module.exports = (io) => {
-  io.use(authenticate);
+  io
+    .use(authenticate)
+    .on('connection', (socket) => {
+      socket.on('message', async (msg) => {
+        const messageObject = {
+          text: msg.trim(),
+          userId: socket.handshake.user.id,
+        };
+        const message = await MessageSchema.create(messageObject);
+        socket.broadcast.emit('message', message);
+      });
 
-  io.on('connection', (socket) => {
-    socket.on('message', async (msg) => {
-      const messageObject = {
-        text: msg.trim(),
-        userId: socket.handshake.user.id,
-      };
-
-      const message = await MessageSchema.create(messageObject);
-      console.log(message);
+      socket.on('history', async () => {
+        const messages = await MessageSchema
+          .find({})
+          .sort({ date: -1 })
+          .limit(50)
+          .sort({ date: 1 })
+          .lean();
+        socket.emit('history', messages);
+      });
     });
-
-    socket.on('history', async () => {
-      const messages = await MessageSchema
-        .find({})
-        .sort({ date: -1 })
-        .limit(50)
-        .sort({ date: 1 })
-        .lean();
-      socket.emit('history', messages);
-    });
-  });
 };
