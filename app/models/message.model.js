@@ -7,7 +7,7 @@ const Schema = mongoose.Schema;
 const MessageSchema = new Schema(
   {
     text: { type: String },
-    userId: { type: String },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'UserModel' },
     time: { type: Date, default: Date.now },
   }, {
     versionKey: false,

@@ -13,7 +13,6 @@ mongoose.connect('mongodb://admin:admin@ds119524.mlab.com:19524/node-auth', {
 });
 mongoose.Promise = Promise;
 
-
 router.get('/', (req, res) => {
   res.json({
     message: 'hello',
@@ -69,6 +68,39 @@ router.get('/user', passport.authenticate('jwt', {
   session: false,
 }), (req, res) => {
   res.json({ name: res.req.user.name });
+});
+
+const MessageSchema = require('./models/message.model');
+const processMessage = require('./common/processMessage');
+
+router.get('/history/:begin/:limit', passport.authenticate('jwt', {
+  session: false,
+}), async (req, res) => {
+  const begin = +req.params.begin;
+  const limit = +req.params.limit;
+
+  if (begin < 0 || limit < 1) {
+    res.status(400).json({ message: 'passed arguments less or qual to 0' });
+  }
+
+  try {
+    const messagesCount = await MessageSchema.count();
+    const messages = await MessageSchema
+      .find({})
+      .populate({ path: 'userId', select: 'name' })
+      .sort({ date: -1 })
+      .skip(begin)
+      .limit(limit)
+      .sort({ date: 1 })
+      .lean();
+    res.json({
+      page: Math.ceil(begin / limit),
+      pages: Math.ceil(messagesCount / limit),
+      messages: messages.map(message => processMessage(message)),
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = router;

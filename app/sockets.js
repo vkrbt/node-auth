@@ -11,27 +11,24 @@ const authenticate = (socket, next) => {
   next();
 };
 
+const processMessage = require('./common/processMessage');
+
 module.exports = (io) => {
   io
     .use(authenticate)
     .on('connection', (socket) => {
       socket.on('message', async (msg) => {
-        const messageObject = {
-          text: msg.trim(),
-          userId: socket.handshake.user.id,
-        };
-        const message = await MessageSchema.create(messageObject);
-        socket.broadcast.emit('message', message);
-      });
-
-      socket.on('history', async () => {
-        const messages = await MessageSchema
-          .find({})
-          .sort({ date: -1 })
-          .limit(50)
-          .sort({ date: 1 })
-          .lean();
-        socket.emit('history', messages);
+        const text = msg.trim();
+        if (text) {
+          const messageObject = {
+            text,
+            user: socket.handshake.user.id,
+          };
+          const message = await MessageSchema.create(messageObject);
+          const populatedMessage = await MessageSchema.findOne(message).populate({ path: 'user', select: 'name' });
+          socket.broadcast.emit('message', processMessage(populatedMessage._doc));
+          socket.emit('message', processMessage(populatedMessage._doc));
+        }
       });
     });
 };
