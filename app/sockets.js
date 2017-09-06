@@ -24,10 +24,14 @@ module.exports = (io) => {
             text,
             user: socket.handshake.user.id,
           };
-          const message = await MessageSchema.create(messageObject);
-          const populatedMessage = await MessageSchema.findOne(message).populate({ path: 'user', select: 'name' });
-          socket.broadcast.emit('message', processMessage(populatedMessage._doc));
-          socket.emit('message', processMessage(populatedMessage._doc));
+          try {
+            const message = await MessageSchema.create(messageObject);
+            const populatedMessage = await MessageSchema.findOne(message).populate({ path: 'user', select: 'name' }).lean().exec();
+            socket.broadcast.emit('message', processMessage(populatedMessage));
+            socket.emit('message', processMessage(populatedMessage));
+          } catch (err) {
+            console.error(err);
+          }
         }
       });
     });

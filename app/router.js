@@ -44,6 +44,10 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post('/logout', async (req, res) => {
+  console.log(req.app.get('io'));
+});
+
 router.post('/register', async (req, res) => {
   try {
     let user = await UserModel.findOne({ name: req.body.name })
@@ -67,7 +71,7 @@ router.post('/register', async (req, res) => {
 router.get('/user', passport.authenticate('jwt', {
   session: false,
 }), (req, res) => {
-  res.json({ name: res.req.user.name });
+  res.json({ name: res.req.user.name, id: res.req.user._id });
 });
 
 const MessageSchema = require('./models/message.model');
@@ -88,10 +92,10 @@ router.get('/history/:begin/:limit', passport.authenticate('jwt', {
     const messages = await MessageSchema
       .find({})
       .populate({ path: 'userId', select: 'name' })
-      .sort({ date: -1 })
+      .sort({ time: -1 })
       .skip(begin)
       .limit(limit)
-      .sort({ date: 1 })
+      .sort({ time: 1 })
       .lean();
     res.json({
       page: Math.ceil(begin / limit),
