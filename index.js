@@ -27,6 +27,8 @@ const io = require('socket.io')(server, {
   serveClient: true,
 });
 
+app.set('io', io);
+
 require('./app/sockets')(io);
 
 module.exports = app;

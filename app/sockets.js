@@ -17,6 +17,7 @@ module.exports = (io) => {
   io
     .use(authenticate)
     .on('connection', (socket) => {
+      socket.emit('connected');
       socket.on('message', async (msg) => {
         const text = msg.trim();
         if (text) {

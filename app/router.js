@@ -46,6 +46,7 @@ router.post('/login', async (req, res) => {
 
 router.post('/logout', async (req, res) => {
   console.log(req.app.get('io'));
+  res.json({});
 });
 
 router.post('/register', async (req, res) => {
@@ -91,12 +92,13 @@ router.get('/history/:begin/:limit', passport.authenticate('jwt', {
     const messagesCount = await MessageSchema.count();
     const messages = await MessageSchema
       .find({})
-      .populate({ path: 'userId', select: 'name' })
       .sort({ time: -1 })
+      .populate({ path: 'user', select: 'name' })
       .skip(begin)
       .limit(limit)
-      .sort({ time: 1 })
-      .lean();
+      .lean()
+      .exec();
+    console.log(messages);
     res.json({
       page: Math.ceil(begin / limit),
       pages: Math.ceil(messagesCount / limit),
