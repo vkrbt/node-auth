@@ -27,6 +27,7 @@ router.post('/login', async (req, res) => {
     if (user && req.body.password && bcrypt.compareSync(req.body.password, user.password)) {
       const token = jwt.sign({
         id: user._id,
+        expiresIn: 30,
       }, options.secretOrKey);
 
       res.json({
@@ -98,7 +99,6 @@ router.get('/history/:begin/:limit', passport.authenticate('jwt', {
       .limit(limit)
       .lean()
       .exec();
-    console.log(messages);
     res.json({
       page: Math.ceil(begin / limit),
       pages: Math.ceil(messagesCount / limit),
